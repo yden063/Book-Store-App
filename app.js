@@ -32,9 +32,17 @@ class UI {
       <td>${book.title}</td>
       <td>${book.author}</td>
       <td>${book.isbn}</td>
+      <td><button class='btn btn-danger' id='${book.isbn}'>X</button></td>
     `;
 
     books.appendChild(row);
+  }
+
+  static removeBookFromList(target) {
+    let trNode = target.parentNode.parentNode;
+    let trNodeParent = trNode.parentNode;
+
+    trNodeParent.removeChild(trNode);
   }
 }
 
@@ -66,6 +74,20 @@ class Storage {
     // We modify the old array object by the new one
     localStorage.setItem('books', JSON.stringify(books));
   }
+
+  static remove(isbn) {
+    const books = Storage.getBooks();
+    let newBooks = new Array();
+
+    books.forEach((book, index) => {
+      if (book.isbn != isbn)
+        newBooks.push(book);
+    });
+
+    console.log(newBooks);
+    // We modify the old array object by the new one
+    localStorage.setItem('books', JSON.stringify(newBooks));
+  }
 }
 
 // Event: Display books
@@ -86,3 +108,14 @@ document.addEventListener('submit', (e) => {
 });
 
 // Event: Remove a book
+document.querySelector('#books').addEventListener('click', (e) => {
+  // Delete a book from the list (UI)
+  // and from the local storage
+  const target = e.target;
+  UI.removeBookFromList(target);
+
+  // Extract the id (isbn) to search for it 
+  // and delete the book assiociated from storage
+  const isbn = target.getAttribute('id');
+  Storage.remove(isbn);
+});
